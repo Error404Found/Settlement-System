@@ -170,8 +170,11 @@ public class SettlementSystemImpl implements SettlementSystem {
 		double netFund = participantDAO.getNetFunds(particiapntId);
 		
 		double finalFunds = balanceFund - netFund;
+		for(Security security :l1)
+		{
+			participantDAO.updateParticipantBalance(particiapntId, security.getSecurityId(),security.getSecurityQuantity());
+		}
 		
-		participantDAO.updateSecurityBalance(particiapntId, l1);
 		participantDAO.updateFundBalance(particiapntId, finalFunds);
 		return true;
 		
@@ -186,17 +189,17 @@ public class SettlementSystemImpl implements SettlementSystem {
 		double fundShortage = 0;
 		if(netFund<0)
 		{
-			System.out.println("participant needs to give funds");
+			System.out.println("participant HAS negative obligation for funds");
 			
 			if((balanceFund-(netFund*(-1)))<0)
 			{
 				fundShortage =(netFund*(-1)-balanceFund);
-				System.out.println("Shortage detedted:"+(netFund*(-1)-balanceFund));
+				System.out.println("Shortage detedted:"+fundShortage);
 			}
 		}
 		else
 		{
-			System.out.println("receive funds");
+			System.out.println("positive obligation for funds");
 		}
 		
 		
@@ -212,7 +215,7 @@ public class SettlementSystemImpl implements SettlementSystem {
 		
 		List<Security> list =participantDAO.getNetSecurities(participantId);
 		double netFunds = participantDAO.getNetFunds(participantId);
-		
+		System.out.println("\n\n");
 		System.out.println("SETTLEMENT HOUSE OBLIGATION REPORT");
 		System.out.println("******************************************");
 		System.out.println("CLEARING MEMBER ID:"+par.getParticipantId());
@@ -237,11 +240,11 @@ public class SettlementSystemImpl implements SettlementSystem {
 	}
 
 	@Override
-	public void performNettingProcedure(HashMap<Integer, HashMap<Integer, Integer>> securitiesNettingMap, HashMap<Integer, Double> fundsNettingMap) {
+	public void performNettingProcedure() {
 		// TODO Auto-generated method stub
-				//give funds an ID of -1
 				try {
-				
+				HashMap<Integer, HashMap<Integer, Integer>> securitiesNettingMap =new HashMap<>();
+				HashMap<Integer, Double> fundsNettingMap=new HashMap<>();
 				TransactionDAO transactionDAO=new TransactionDAOImpl();
 				List<Transaction> transactions=transactionDAO.getAllTransaction();
 				//System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"+transactions.size());
@@ -341,9 +344,10 @@ public class SettlementSystemImpl implements SettlementSystem {
 					int updateqty=Math.round((float)list.get(4)/list.get(3));
 					list.set(4, list.get(4)+updateqty);
 					
-					double updateFund = updateqty*randomDouble;
+					//double updateFund = updateqty*randomDouble;
+					double updateFund = updateqty*list.get(6);
 					
-					if(dao.updateFundBalance(list.get(0),dao.getAllFundBalanceByParticpantId(list.get(0))-updateFund))
+					if(dao.updateFundBalance(list.get(0),dao.getOpeningFunds(list.get(0))-updateFund))
 					{
 						System.out.println("Rights performed successfully");
 					}
