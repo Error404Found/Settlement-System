@@ -53,12 +53,15 @@ public List<Security> getOpeningSecurities(int participantId) { {
 			
 			ResultSet set= ps.executeQuery();
 			while(set.next()) {
-				int sid=set.getInt("security_id");
-				String sname=set.getString("security_name");
-				int qty=set.getInt("security_quantity");
+				int securityId=set.getInt("security_id");
+				String securityName=set.getString("security_name");
+				int securityQuantity=set.getInt("security_quantity");
+//				int corporateAction=set.getInt("corporate_action");
+//				int corporateActionRatio=set.getInt("corporate_action_ratio");
+//				int performRights =set.getInt("perform_rights");
+//				
 				
-				
-				Security sec=new Security(sname,sid,qty);
+				Security sec=new Security(securityName,securityId,securityQuantity);
 				sec_list.add(sec);
 			}
 			System.out.println("List size= "+sec_list.size());
@@ -274,8 +277,8 @@ try {
 			ps.setString(2, participant.getParticipantName());
 			ps.setString(3, participant.getEmailId());
 			ps.setString(4, participant.getContactNumber());
-			ps.setFloat(5, participant.getFunds());
-			ps.setFloat(6, participant.getFeeForSettlement());
+			ps.setDouble(5, participant.getFunds());
+			ps.setDouble(6, participant.getFeeForSettlement());
 			rowInserted=ps.executeUpdate();
 			System.out.println("row inserted in participant table");
 			
@@ -376,8 +379,8 @@ try {
 			String participantName="";
 			String emailId="";
 			String contactNumber="";
-			float funds=0;
-			float feeForSettlement=0;
+			double funds=0;
+			double feeForSettlement=0;
 			List<Security> listOfSecurities=new ArrayList<>();
 			
 			PreparedStatement ps = openConnection().prepareStatement(FIND_PARTICIPANT);
@@ -388,8 +391,8 @@ try {
 				participantName= set.getString("participant_name");
 				emailId= set.getString("email_ID");
 				contactNumber=set.getString("contact_no");
-				funds=set.getFloat("funds");
-				feeForSettlement=set.getFloat("fee_for_settlement");
+				funds=set.getDouble("funds");
+				feeForSettlement=set.getDouble("fee_for_settlement");
 				System.out.println("details obtained from participant");
 			}
 			
